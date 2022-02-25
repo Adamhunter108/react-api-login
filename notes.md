@@ -183,8 +183,74 @@ Ok, let's finally get into Header.js.
 
 Change the div to a header tag.  Grab some Navbar [code](https://react-bootstrap.netlify.app/components/navbar/) to customize.  I am using the off-canvas menu.  Change href links to Link Containers to get that SPA (single page application) feel.
 
-To be able to use [Font Awesome Icons](https://fontawesome.com/icons):  Get the font-awesome [CDN](https://cdnjs.com/) link and add it to project-name/public/index.html
+To be able to use [Font Awesome Icons](https://fontawesome.com/icons):  Get the font-awesome [CDN](https://cdnjs.com/) link and add it to project-name/public/index.html and then just add the i tag where you want the icon.
 
 ```html
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+```
+Header.js
+```javascript
+import React, { useState } from 'react'
+import { Navbar, Nav, Container, NavDropdown, Form, FormControl, Button } from 'react-bootstrap'
+import { LinkContainer } from 'react-router-bootstrap'
+import Offcanvas from 'react-bootstrap/Offcanvas'
+
+function Header() {
+
+  return (
+    <header>
+        <Navbar bg="black" variant="dark" expand={false}>
+            <Container fluid>
+                <LinkContainer to='/'>
+                    <Navbar.Brand>        
+                        <img
+                            alt=""
+                            src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/285/fire_1f525.png"
+                            width="30"
+                            height="30"
+                            className="d-inline-block align-top"
+                        />{' '}
+                        App Name
+                    </Navbar.Brand>
+                 </LinkContainer>
+                 <Navbar.Toggle aria-controls="offcanvasNavbar" />
+                 <Navbar.Offcanvas 
+                    id="offcanvasNavbar"
+                    aria-labelledby="offcanvasNavbarLabel"
+                    placement="end"
+                >
+            <Offcanvas.Header closeButton>
+                <Offcanvas.Title id="offcanvasNavbarLabel">Offcanvas Menu Title</Offcanvas.Title>
+            </Offcanvas.Header>
+            <Offcanvas.Body>
+                <Nav className="justify-content-end flex-grow-1 pe-3">
+
+                <LinkContainer to='/'>
+                    <Nav.Link><i class="fa-solid fa-house-chimney"></i>  Home</Nav.Link>
+                </LinkContainer>
+
+                <LinkContainer to='login'>
+                    <Nav.Link><i class="fa-solid fa-skull"></i>  Log in</Nav.Link>
+                </LinkContainer>
+
+                </Nav>
+                <Form className="d-flex">
+                    <FormControl
+                        type="search"
+                        placeholder="Search"
+                        className="me-2"
+                        aria-label="Search"
+                    />
+                    <Button variant="outline-success">Search</Button>
+                </Form>
+            </Offcanvas.Body>
+            </Navbar.Offcanvas>
+             </Container>
+        </Navbar>
+
+    </header>
+  )
+}
+
+export default Header
 ```
