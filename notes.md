@@ -254,3 +254,165 @@ function Header() {
 
 export default Header
 ```
+
+Before we build out the LoginScreen and RegisterScreen, create FormContainer.js in src/components.
+
+```javascript
+import React from 'react'
+import { Container, Row, Col } from 'react-bootstrap'
+
+function FormContainer({ children }) {
+    return (
+        <Container>
+            <Row className="justify-content-md-center">
+                <Col xs={12} md={6}>
+                    {children}
+                </Col>
+            </Row>
+        </Container>
+    )
+}
+
+export default FormContainer
+```
+
+Now we can use the FormContainer we just built along with React Bootstrap Form, Button, Row, Col, and Card components for the LoginScreen and RegisterScreen.
+
+LoginScreen.js
+```javascript
+import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { Form, Button, Row, Col, Card } from 'react-bootstrap'
+import FormContainer from '../components/FormContainer'
+
+function LoginScreen({ location, history }) {
+
+    return (
+        <Card 
+            className="text-center"
+            >
+        <FormContainer>
+        <Card.Header as="h3"><i class="fa-solid fa-skull"></i> Sign In</Card.Header>
+        <br />
+
+            <Form>
+
+                <Form.Group controlId='email'>
+                    <Form.Label><i class="fas fa-envelope"></i> Email Address</Form.Label>
+                    <Form.Control
+                        type='email'
+                        placeholder='Enter Email'
+                    >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Form.Group controlId='password'>
+                    <Form.Label><i class="fas fa-key"></i> Password</Form.Label>
+                    <Form.Control
+                        type='password'
+                        placeholder='Enter Password'
+                    >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Button type='submit' variant='dark'>Sign in</Button>
+
+            </Form>
+
+            <Row className='py-3'>
+                <Col>
+                    Don't have an account yet?  <Link to={'/register'}>Make one here.</Link>
+                </Col>
+            </Row>
+
+        </FormContainer>
+        </Card>
+    )
+}
+
+export default LoginScreen
+```
+
+RegisterScreen.js
+```javascript
+import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { Form, Button, Row, Col, Card } from 'react-bootstrap'
+import FormContainer from '../components/FormContainer'
+
+
+function RegisterScreen({ location, history }) {
+
+    return (
+        <Card 
+            className="text-center"
+            >
+        <FormContainer>
+            <Card.Header as="h3"><i class="fa-solid fa-skull"></i> Create An Account</Card.Header>
+            <br />
+
+            <Form>
+            
+                <Form.Group controlId='name'>
+                    <Form.Label><i className="fas fa-user"></i> Name</Form.Label>
+                        <Form.Control
+                            required
+                            type='name'
+                            placeholder='Enter Your Name'
+                        >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Form.Group controlId='email'>
+                    <Form.Label><i class="fas fa-envelope"></i> Email Address</Form.Label>
+                        <Form.Control
+                            required
+                            type='email'
+                            placeholder='Enter Email'
+                        >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Form.Group controlId='password'>
+                    <Form.Label><i class="fas fa-key"></i> Password</Form.Label>
+                    <Form.Control
+                        required
+                        type='password'
+                        placeholder='Enter Password'
+                    >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Form.Group controlId='passwordConfirm'>
+                    <Form.Label><i class="fas fa-key"></i> Confirm Password</Form.Label>
+                    <Form.Control
+                        required
+                        type='password'
+                        placeholder='Enter Password'
+                    >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Button type='submit' variant='dark'>Register</Button>
+
+            </Form>
+
+            <Row className='py-3'>
+            <Col>
+                    Already have an account?  <Link to={'/login'}></Link>
+                </Col>
+            </Row>
+
+        </FormContainer>
+        </Card>
+    )
+}
+
+export default RegisterScreen
+```
