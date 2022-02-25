@@ -113,7 +113,7 @@ function RegisterScreen({ location, history }) {
 
             <Row className='py-3'>
             <Col>
-                    Already have an account?  <Link to={'/login'}></Link>
+                    Already have an account? <Link to={'/login'}>Sign in here.</Link>
                 </Col>
                 {/* <Col>
                     Already have an account? <Link
