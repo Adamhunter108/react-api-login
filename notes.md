@@ -404,7 +404,8 @@ function RegisterScreen({ location, history }) {
             </Form>
 
             <Row className='py-3'>
-            <Col>
+                <Col>
+                    Already have an account? <Link to={'/login'}>Sign in here.</Link>
                 </Col>
             </Row>
 
