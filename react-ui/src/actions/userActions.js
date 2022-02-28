@@ -87,7 +87,7 @@ import {
        }
 
        const { data } = await axios.post(
-           '/api/users/register/',
+           'http://localhost:8000/api/users/register/',
            { 'name': name, 'email': email, 'password': password },
            config
            )

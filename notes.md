@@ -562,27 +562,6 @@ import {
             return state
     }
 }
-
-
-export const userRegisterReducer = (state ={ }, action) => {
-    switch (action.type) {
-        case USER_REGISTER_REQUEST:
-            return { loading: true }
-
-        case USER_REGISTER_SUCCESS:
-            return { loading: false, userInfo: action.payload }
-
-        case USER_REGISTER_FAIL:
-            return { loading: false, error: action.payload }
-
-        case USER_LOGOUT:
-            return {}
-
-        default:
-            return state
-    }
-}
-
 ```
 
 Ok, now we are up to the actions where we get to call the [API](https://github.com/Adamhunter108/django-api-login).   To call the API, it has to be up and running.  Make sure you have that running on port 8000 in a separate terminal.  If you are using VS Code and using the built in terminals, you can color code them... if your'e into that sort of thing.
@@ -644,53 +623,6 @@ import {
         })
      }
  }
-
-
- export const logout = () => (dispatch) => {
-     localStorage.removeItem('userInfo')
-     dispatch({ type: USER_LOGOUT })
- }
- 
-
- export const register = (name, email, password) => async (dispatch) => {
-    try {
-       dispatch({
-           type: USER_REGISTER_REQUEST
-       })
-
-       const config = {
-           headers:{
-               'Content-Type': 'application/json'
-           }
-       }
-
-       const { data } = await axios.post(
-           '/api/users/register/',
-           { 'name': name, 'email': email, 'password': password },
-           config
-           )
-
-           dispatch({
-               type: USER_REGISTER_SUCCESS,
-               payload: data
-           })
-
-           dispatch({
-            type: USER_LOGIN_SUCCESS,
-            payload: data
-        })
-
-           localStorage.setItem('userInfo', JSON.stringify(data))
-
-    } catch (error) {
-       dispatch({ 
-           type: USER_REGISTER_FAIL,
-           payload: error.response && error.response.data.detail
-               ? error.response.data.detail
-               : error.message,
-       })
-    }
-}
 ```
 
 Since we are using localStorage for the user data, we need to update the store and get that data into the initialState:
@@ -700,14 +632,13 @@ store.js
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
-import { userLoginReducer, userRegisterReducer } from './reducers/userReducers'
+import { userLoginReducer } from './reducers/userReducers'
 
 // https://redux.js.org/api/api-reference
 
 // reducers go in as key: value pairs
 const reducer = combineReducers({
-    userLogin: userLoginReducer,
-    userRegister: userRegisterReducer,
+    userLogin: userLoginReducer
 })
 
 const userInfoFromStorage = localStorage.getItem('userInfo') ?
@@ -811,9 +742,319 @@ function LoginScreen({ location, history }) {
 export default LoginScreen
 ```
 
-And since we are using React Router v6, we need to add a this [Route](https://reactrouter.com/docs/en/v6/getting-started/tutorial#adding-a-no-match-route) to App.js so the useNavigate hook can work.
+And since we are using React Router v6, we need to import and add this [Route](https://reactrouter.com/docs/en/v6/getting-started/tutorial#adding-a-no-match-route) to App.js so the useNavigate hook can work.
 
 App.js
 ```javascript
 <Route path="*" element={<Navigate to='/' replace />} />
 ```
+
+Now we have successfully logged into our Django app via a brand new React frontend.  That is pretty cool.  This has officially become a full-stack project.  
+
+Using the Redux hook [useSelector](https://react-redux.js.org/api/hooks#useselector), let's use that global state of the user's data and fix up the navigation and welcome our user and hide the login link.  Let's also give the user the option to logout using the useDispatch hook and the following action.  We will use some conditional logic for this.  We also already prepped for this and have the USER_LOGOUT constant.
+
+Add the following to userActions.js
+```javascript
+ export const logout = () => (dispatch) => {
+     localStorage.removeItem('userInfo')
+     dispatch({ type: USER_LOGOUT })
+ }
+```
+
+components/Header.js
+```javascript
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Navbar, Nav, Container, NavDropdown, Form, FormControl, Button } from 'react-bootstrap'
+import { LinkContainer } from 'react-router-bootstrap'
+import Offcanvas from 'react-bootstrap/Offcanvas'
+import { logout } from '../actions/userActions'
+
+function Header() {
+
+    // https://react-redux.js.org/api/hooks#useselector-examples
+    const userLogin = useSelector(state => state.userLogin)
+    // destruct what is coming from the store to just grab userInfo
+    const { userInfo } = userLogin 
+
+    const dispatch = useDispatch()
+
+    const logoutHandler = () => {
+        // console.log('Logout')
+        dispatch(logout())
+    }
+    
+
+  return (
+    <header>
+        <Navbar bg="black" variant="dark" expand={false}>
+            <Container fluid>
+                <LinkContainer to='/'>
+                    <Navbar.Brand>        
+                        <img
+                            alt=""
+                            src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/285/fire_1f525.png"
+                            width="30"
+                            height="30"
+                            className="d-inline-block align-top"
+                        />{' '}
+                        App Name
+                    </Navbar.Brand>
+                 </LinkContainer>
+                 <Navbar.Toggle aria-controls="offcanvasNavbar" />
+                 <Navbar.Offcanvas 
+                    id="offcanvasNavbar"
+                    aria-labelledby="offcanvasNavbarLabel"
+                    placement="end"
+                >
+            <Offcanvas.Header closeButton>
+                <Offcanvas.Title id="offcanvasNavbarLabel">Offcanvas Menu Title</Offcanvas.Title>
+            </Offcanvas.Header>
+            <Offcanvas.Body>
+                <Nav className="justify-content-end flex-grow-1 pe-3">
+
+                <LinkContainer to='/'>
+                    <Nav.Link><i class="fa-solid fa-house-chimney"></i>  Home</Nav.Link>
+                </LinkContainer>
+
+            {/* if user is logged in show NavDropdown and Logout link, else show Login link */}
+            {userInfo ? (
+                <NavDropdown title={'Yo, ' + userInfo.name} id='username'>
+
+                    <NavDropdown.Item onClick={logoutHandler}><i class="fas fa-sign-out-alt"></i> Logout</NavDropdown.Item>
+
+                </NavDropdown>
+            ): (
+                <LinkContainer to='/login'>
+                    <Nav.Link to="/login"><i class="fa-solid fa-skull"></i> Login</Nav.Link>
+                </LinkContainer>
+            )}
+
+                </Nav>
+                <Form className="d-flex">
+                    <FormControl
+                        type="search"
+                        placeholder="Search"
+                        className="me-2"
+                        aria-label="Search"
+                    />
+                    <Button variant="outline-success">Search</Button>
+                </Form>
+            </Offcanvas.Body>
+            </Navbar.Offcanvas>
+             </Container>
+        </Navbar>
+
+    </header>
+  )
+}
+
+export default Header
+```
+
+Ok, let's wire up the RegisterScreen.  First we get into that Redux flow.  We already set the constants so let's make the reducer, add it to the store and then make the API call in actions.
+
+Add the following to userReducers.js
+```javascript
+export const userRegisterReducer = (state ={ }, action) => {
+    switch (action.type) {
+        case USER_REGISTER_REQUEST:
+            return { loading: true }
+
+        case USER_REGISTER_SUCCESS:
+            return { loading: false, userInfo: action.payload }
+
+        case USER_REGISTER_FAIL:
+            return { loading: false, error: action.payload }
+
+        case USER_LOGOUT:
+            return {}
+
+        default:
+            return state
+    }
+}
+```
+
+Add that reducer function to the store:
+Store.js
+```javascript
+import { userLoginReducer, userRegisterReducer } from './reducers/userReducers'
+
+// reducers go in as key: value pairs
+const reducer = combineReducers({
+    userLogin: userLoginReducer,
+    userRegister: userRegisterReducer
+})
+```
+
+And now the API call in userActions:
+```javascript
+ export const register = (name, email, password) => async (dispatch) => {
+    try {
+       dispatch({
+           type: USER_REGISTER_REQUEST
+       })
+
+       const config = {
+           headers:{
+               'Content-Type': 'application/json'
+           }
+       }
+
+       const { data } = await axios.post(
+           'http://localhost:8000/api/users/register/',
+           { 'name': name, 'email': email, 'password': password },
+           config
+           )
+
+           dispatch({
+               type: USER_REGISTER_SUCCESS,
+               payload: data
+           })
+
+           dispatch({
+            type: USER_LOGIN_SUCCESS,
+            payload: data
+        })
+
+           localStorage.setItem('userInfo', JSON.stringify(data))
+
+    } catch (error) {
+       dispatch({ 
+           type: USER_REGISTER_FAIL,
+           payload: error.response && error.response.data.detail
+               ? error.response.data.detail
+               : error.message,
+       })
+    }
+}
+```
+
+Now let's use the Redux hooks again to set the functionality of the RegisterScreen.  We also use the same useNavigate hook from React Router and the same useEffect hook that we used in the LoginScreen.
+RegisterScreen.js
+```javascript
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Form, Button, Row, Col, Card } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
+// import Loader from '../components/Loader'
+// import Message from '../components/Message'
+import { register } from '../actions/userActions'
+import FormContainer from '../components/FormContainer'
+
+
+function RegisterScreen({ location, history }) {
+
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [message, setMessage] = useState('')
+
+    const dispatch = useDispatch()
+
+    const userRegister = useSelector(state => state.userRegister)
+
+    const { userInfo } = userRegister
+
+    let navigate = useNavigate();
+
+    useEffect(() => {
+        if(userInfo){
+            return navigate("/");
+        }
+    }, [userInfo, navigate])
+
+
+    const submitHandler = (event) => {
+        event.preventDefault()
+        if(password !== confirmPassword){
+            setMessage('Passwords do not match')
+        } else {
+            dispatch(register(name, email, password))
+        }
+        
+    }
+
+    return (
+        <Card 
+            className="text-center"
+            >
+        <FormContainer>
+            <Card.Header as="h3"><i class="fa-solid fa-skull"></i> Create An Account</Card.Header>
+            <br />
+
+            <Form onSubmit={submitHandler}>
+
+                <Form.Group controlId='name'>
+                    <Form.Label><i className="fas fa-user"></i> Name</Form.Label>
+                        <Form.Control
+                            required
+                            type='name'
+                            placeholder='Enter Your Name'
+                            value={name}
+                            onChange={(event) => setName(event.target.value)}
+                        >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Form.Group controlId='email'>
+                    <Form.Label><i class="fas fa-envelope"></i> Email Address</Form.Label>
+                        <Form.Control
+                            required
+                            type='email'
+                            placeholder='Enter Email'
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                        >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Form.Group controlId='password'>
+                    <Form.Label><i class="fas fa-key"></i> Password</Form.Label>
+                    <Form.Control
+                        required
+                        type='password'
+                        placeholder='Enter Password'
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                    >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Form.Group controlId='passwordConfirm'>
+                    <Form.Label><i class="fas fa-key"></i> Confirm Password</Form.Label>
+                    <Form.Control
+                        required
+                        type='password'
+                        placeholder='Enter Password Again'
+                        value={confirmPassword}
+                        onChange={(event) => setConfirmPassword(event.target.value)}
+                    >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Button type='submit' variant='dark'>Register</Button>
+
+            </Form>
+
+            <Row className='py-3'>
+            <Col>
+                Already have an account? <Link to={'/login'}>Sign in here.</Link>
+            </Col>
+
+            </Row>
+
+        </FormContainer>
+        </Card>
+    )
+}
+
+export default RegisterScreen
+```
+

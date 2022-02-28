@@ -20,6 +20,8 @@ function LoginScreen({ location, history }) {
     // const { error, loading, userInfo } = userLogin
     const { userInfo } = userLogin
 
+
+    // outdated
     // useEffect(() => {
     //     if(userInfo){
     //         history.push(redirect)
