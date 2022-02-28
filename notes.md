@@ -416,3 +416,398 @@ function RegisterScreen({ location, history }) {
 
 export default RegisterScreen
 ```
+
+---
+---
+
+## Redux
+
+### `Redux flow:`
+* make constants
+* make reducers with the constants:
+    * state is changed through reducers
+    * reducer functions manipulate and pass state down to components
+    * functions that takes an action and the previous state of the application and returns the new state
+    * create case statements with constants
+* register the reducer with the store: 
+    * in store.js, import the reducer and add to combineReducers()
+* make actions: 
+    * objects that represent the intention to change state
+    * import costants again (these specify type for dispatch) and axios create dispatch functions and make api call
+* add local storage object to initialState in store.js
+
+[Redux](https://redux.js.org/), everybody's favorite state management tool.  I have an entire blog post about it which is mostly a high level introduction.  The blog post is about six months old and surprisingly not outdated already, feel free to check it out if this is new to you.
+
+Redux is for managing global application state, not component state. User's data is a great use for Redux.  This way any components that need access to this data will have it available.  While Redux can be a bit complicated, there is a flow to it.  You make your constants, then reducers, register them in the store and then create actions.  But before that, we need to make some installs and set up the store.  
+
+We obviously need to install Redux.  Since Redux is not React specific, we will need to install [React-Redux](https://react-redux.js.org/) to connect them.   We will also install [Redux-Thunk](https://www.npmjs.com/package/redux-thunk), which is middleware that allows for asynchronous requests from the actions to the Redux store.  
+
+I also recomend [Redux Dev Tools Chrome extention](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en), which makes things a little easier to see.  In order to give the extention access to our Redux store, we will to install that too, [redux-devtools-extension](https://www.npmjs.com/package/redux-devtools-extension).  
+
+
+
+```bash
+$ # install redux
+$ npm i redux
+$ # install react-redux
+$ npm i react-redux
+$ # install redux-thunk
+$ npm i redux-thunk
+$ # install redux-devtools-extension
+$ npm i redux-devtools-extension
+```
+Now we can create our Redux store.  Create src/store.js.  
+
+```javascript
+import { createStore, combineReducers, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk'
+import { composeWithDevTools } from 'redux-devtools-extension'
+
+// https://redux.js.org/api/api-reference
+
+// reducers go in as key: value pairs
+const reducer = combineReducers({})
+
+const initialState = {}
+
+const middleware = [thunk]
+
+const store = createStore(reducer, initialState, composeWithDevTools(applyMiddleware(...middleware)))
+
+export default store
+```
+
+Next, add the store and the [Provider](https://react-redux.js.org/api/provider) component in index.js to make the store available.
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux'
+import store from './store'
+import { BrowserRouter } from "react-router-dom";
+import './index.css';
+import './bootstrap.min.css'
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+
+
+ReactDOM.render(
+  <BrowserRouter>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </BrowserRouter>,
+  document.getElementById('root')
+);
+
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+```
+
+Now prepare for the constants, reducers and actions by making directories for them.  This is optional but again, it is good to stay organized, especially if you plan on adding on to the application.
+
+```bash
+$ # make all three directories in the src directory
+$ mkdir src/constants src/reducers src/actions
+$ # in those new directories, create the JavaScript files
+$ touch src/constants/userConstants.js src/reducers/userReducers.js src/actions/userActions.js
+```
+
+First lets get into the constants.  Defining these may seem a little pointless and a lot of developers ask why we do this.  According to the author of Redux and some helpful devs over at stackoverflow, defining constants this way helps minimize typos/bugs, keeps naming conventions consistent, helps with keeping track of scope and implementing new features because it is beneficial to see all existing actions in one place.
+
+userConstants.js
+```javascript
+export const USER_LOGIN_REQUEST = 'USER_LOGIN_REQUEST'
+export const USER_LOGIN_SUCCESS = 'USER_LOGIN_SUCCESS'
+export const USER_LOGIN_FAIL = 'USER_LOGIN_FAIL'
+
+export const USER_LOGOUT = 'USER_LOGOUT'
+
+export const USER_REGISTER_REQUEST = 'USER_REGISTER_REQUEST'
+export const USER_REGISTER_SUCCESS = 'USER_REGISTER_SUCCESS'
+export const USER_REGISTER_FAIL = 'USER_REGISTER_FAIL'
+```
+
+userReducers.js
+```javascript
+import { 
+    USER_LOGIN_REQUEST,
+    USER_LOGIN_SUCCESS,
+    USER_LOGIN_FAIL,
+    USER_LOGOUT,
+    USER_REGISTER_REQUEST,
+    USER_REGISTER_SUCCESS,
+    USER_REGISTER_FAIL
+ } from '../constants/userConstants'
+
+
+ export const userLoginReducer = (state ={ }, action) => {
+    switch (action.type) {
+        case USER_LOGIN_REQUEST:
+            return { loading: true }
+
+        case USER_LOGIN_SUCCESS:
+            return { loading: false, userInfo: action.payload }
+
+        case USER_LOGIN_FAIL:
+            return { loading: false, error: action.payload }
+
+        case USER_LOGOUT:
+            return {}
+
+        default:
+            return state
+    }
+}
+
+
+export const userRegisterReducer = (state ={ }, action) => {
+    switch (action.type) {
+        case USER_REGISTER_REQUEST:
+            return { loading: true }
+
+        case USER_REGISTER_SUCCESS:
+            return { loading: false, userInfo: action.payload }
+
+        case USER_REGISTER_FAIL:
+            return { loading: false, error: action.payload }
+
+        case USER_LOGOUT:
+            return {}
+
+        default:
+            return state
+    }
+}
+
+```
+
+Ok, now we are up to the actions where we get to call the [API](https://github.com/Adamhunter108/django-api-login).   To call the API, it has to be up and running.  Make sure you have that running on port 8000 in a separate terminal.  If you are using VS Code and using the built in terminals, you can color code them... if your'e into that sort of thing.
+
+We will also be using [Axios](https://github.com/axios/axios) to call the API.  Axios is a promise based HTTP client for the browser and Node.js.  Axios is a lot like the built in JavaScript fetch() function except way more powerful.  It handles all HTTP request methods, has pretty simple syntax, has automatic JSON data transformation, ability to cancel requests and more.  Let's install it.
+
+```bash
+$ # in the node.js terminal
+$ npm i axios
+$ # turn node.js server back on
+$ npm start
+```
+
+userActions.js
+```javascript
+import axios from 'axios'
+import { 
+    USER_LOGIN_REQUEST,
+    USER_LOGIN_SUCCESS,
+    USER_LOGIN_FAIL,
+    USER_LOGOUT,
+    USER_REGISTER_REQUEST,
+    USER_REGISTER_SUCCESS,
+    USER_REGISTER_FAIL
+ } from '../constants/userConstants'
+
+
+ export const login = (email, password) => async (dispatch) => {
+     try {
+        dispatch({
+            type: USER_LOGIN_REQUEST
+        })
+
+        const config = {
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        }
+
+        const { data } = await axios.post(
+            '/api/users/login/',
+            {'username': email, 'password': password},
+            config
+            )
+        
+            dispatch({
+                type: USER_LOGIN_SUCCESS,
+                payload: data
+            })
+
+            localStorage.setItem('userInfo', JSON.stringify(data))
+
+     } catch (error) {
+        dispatch({ 
+            type: USER_LOGIN_FAIL,
+            payload: error.response && error.response.data.detail
+                ? error.response.data.detail
+                : error.message,
+        })
+     }
+ }
+
+
+ export const logout = () => (dispatch) => {
+     localStorage.removeItem('userInfo')
+     dispatch({ type: USER_LOGOUT })
+ }
+ 
+
+ export const register = (name, email, password) => async (dispatch) => {
+    try {
+       dispatch({
+           type: USER_REGISTER_REQUEST
+       })
+
+       const config = {
+           headers:{
+               'Content-Type': 'application/json'
+           }
+       }
+
+       const { data } = await axios.post(
+           '/api/users/register/',
+           { 'name': name, 'email': email, 'password': password },
+           config
+           )
+
+           dispatch({
+               type: USER_REGISTER_SUCCESS,
+               payload: data
+           })
+
+           dispatch({
+            type: USER_LOGIN_SUCCESS,
+            payload: data
+        })
+
+           localStorage.setItem('userInfo', JSON.stringify(data))
+
+    } catch (error) {
+       dispatch({ 
+           type: USER_REGISTER_FAIL,
+           payload: error.response && error.response.data.detail
+               ? error.response.data.detail
+               : error.message,
+       })
+    }
+}
+```
+
+Since we are using localStorage for the user data, we need to update the store and get that data into the initialState:
+
+store.js
+```javascript
+import { createStore, combineReducers, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk'
+import { composeWithDevTools } from 'redux-devtools-extension'
+import { userLoginReducer, userRegisterReducer } from './reducers/userReducers'
+
+// https://redux.js.org/api/api-reference
+
+// reducers go in as key: value pairs
+const reducer = combineReducers({
+    userLogin: userLoginReducer,
+    userRegister: userRegisterReducer,
+})
+
+const userInfoFromStorage = localStorage.getItem('userInfo') ?
+    JSON.parse(localStorage.getItem('userInfo')) : null
+
+const initialState = {
+    userLogin: { userInfo: userInfoFromStorage },
+}
+
+const middleware = [thunk]
+
+const store = createStore(reducer, initialState, composeWithDevTools(applyMiddleware(...middleware)))
+
+export default store
+```
+
+And now back to add the functionality to LoginScreen.js.  We are going to use a few hooks here.  We will use the [useDispatch](https://react-redux.js.org/api/hooks#usedispatch) hook to send the email and password in the submitHandler of the form.  We will also use the [useEffect](https://reactjs.org/docs/hooks-effect.html) hook to perform the redirect back to the home screen once the submission is complete using the [useNavigate](https://reactrouter.com/docs/en/v6/api#usenavigate) hook from React Router.
+
+LoginScreen.js
+```javascript
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Form, Button, Row, Col, Card } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
+import { login } from '../actions/userActions'
+import FormContainer from '../components/FormContainer'
+
+function LoginScreen({ location, history }) {
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+
+    const dispatch = useDispatch()
+
+    const userLogin = useSelector(state => state.userLogin)
+    const { userInfo } = userLogin
+
+    // this is how it has to be done now with React Router v6
+    let navigate = useNavigate()
+
+    useEffect(() => {
+        if(userInfo){
+            return navigate("/")
+        }
+    }, [userInfo, navigate])
+
+
+    const submitHandler = (event) => {
+        event.preventDefault()
+        // console.log('Submitted')
+        dispatch(login(email, password))
+    }
+
+    return (
+        <Card 
+            className="text-center"
+            >
+        <FormContainer>
+        <Card.Header as="h3"><i class="fa-solid fa-skull"></i> Sign In</Card.Header>
+        <br />
+
+            <Form onSubmit={submitHandler}>
+                <Form.Group controlId='email'>
+                    <Form.Label><i class="fas fa-envelope"></i> Email Address</Form.Label>
+                    <Form.Control
+                        type='email'
+                        placeholder='Enter Email'
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                    >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Form.Group controlId='password'>
+                    <Form.Label><i class="fas fa-key"></i> Password</Form.Label>
+                    <Form.Control
+                        type='password'
+                        placeholder='Enter Password'
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                    >
+                    </Form.Control>
+                </Form.Group>
+                <br />
+
+                <Button type='submit' variant='dark'>Sign in</Button>
+            
+            </Form>
+
+            <Row className='py-3'>
+                <Col>
+                    Don't have an account yet?  <Link to={'/register'}>Make one here.</Link>
+                </Col>
+            </Row>
+
+        </FormContainer>
+        </Card>
+    )
+}
+
+export default LoginScreen
+
+```

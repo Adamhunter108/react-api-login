@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux'
+import store from './store'
 import { BrowserRouter } from "react-router-dom";
 import './index.css';
 import './bootstrap.min.css'
@@ -13,9 +15,27 @@ import reportWebVitals from './reportWebVitals';
 //   document.getElementById('root')
 // );
 
+// ReactDOM.render(
+//   <BrowserRouter>
+//     <App />
+//   </BrowserRouter>,
+//   document.getElementById('root')
+// );
+
+// ReactDOM.render(
+//   <BrowserRouter>
+//     <Provider store={store}>
+//       <App />
+//     </Provider>
+//   </BrowserRouter>,
+//   document.getElementById('root')
+// );
+
 ReactDOM.render(
   <BrowserRouter>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </BrowserRouter>,
   document.getElementById('root')
 );
