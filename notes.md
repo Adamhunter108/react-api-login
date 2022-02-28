@@ -888,7 +888,7 @@ const reducer = combineReducers({
 })
 ```
 
-And now the API call in userActions:
+And now the POST request to the API in userActions:
 ```javascript
  export const register = (name, email, password) => async (dispatch) => {
     try {
@@ -1057,4 +1057,5 @@ function RegisterScreen({ location, history }) {
 
 export default RegisterScreen
 ```
+If that worked, you should be able to register a new user and when you do, you should be redirected back to the HomeScreen.  Check the Nav to see if it is welcoming your new user.  You can also look inside the Redux dev tool to check the state and in the Users section of the Django admin dashboard at http://localhost:8000/admin/auth/user/.
 
