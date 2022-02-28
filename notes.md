@@ -809,5 +809,11 @@ function LoginScreen({ location, history }) {
 }
 
 export default LoginScreen
+```
 
+And since we are using React Router v6, we need to add a this [Route](https://reactrouter.com/docs/en/v6/getting-started/tutorial#adding-a-no-match-route) to App.js so the useNavigate hook can work.
+
+App.js
+```javascript
+<Route path="*" element={<Navigate to='/' replace />} />
 ```
