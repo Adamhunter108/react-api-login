@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Form, Button, Row, Col, Card } from 'react-bootstrap'
+import { Form, Button, Row, Col, Card, FloatingLabel } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 // import Loader from '../components/Loader'
 // import Message from '../components/Message'
@@ -65,8 +65,10 @@ function RegisterScreen({ location, history }) {
             <Form onSubmit={submitHandler}>
             {/* <Form> */}
             
-                <Form.Group controlId='name'>
-                    <Form.Label><i className="fas fa-user"></i> Name</Form.Label>
+                <Form.Group as={Row} controlId='name'>
+                    <Form.Label column sm={1}><h3><i className="fas fa-user"></i></h3></Form.Label>
+                    <Col>
+                        <FloatingLabel label="Your name">
                         <Form.Control
                             required
                             type='name'
@@ -74,20 +76,26 @@ function RegisterScreen({ location, history }) {
                             value={name}
                             onChange={(event) => setName(event.target.value)}
                         >
-                    </Form.Control>
+                        </Form.Control>
+                        </FloatingLabel>
+                    </Col>
                 </Form.Group>
                 <br />
 
-                <Form.Group controlId='email'>
-                    <Form.Label><i class="fas fa-envelope"></i> Email Address</Form.Label>
-                        <Form.Control
-                            required
-                            type='email'
-                            placeholder='Enter Email'
-                            value={email}
-                            onChange={(event) => setEmail(event.target.value)}
-                        >
-                    </Form.Control>
+                <Form.Group as={Row} controlId='email'>
+                    <Form.Label column sm={1}><h3><i class="fas fa-envelope"></i></h3></Form.Label>
+                    <Col>
+                        <FloatingLabel label="Email">
+                            <Form.Control
+                                required
+                                type='email'
+                                placeholder='Enter Email'
+                                value={email}
+                                onChange={(event) => setEmail(event.target.value)}
+                            >
+                        </Form.Control>
+                    </FloatingLabel>
+                    </Col>
                 </Form.Group>
                 <br />
 
