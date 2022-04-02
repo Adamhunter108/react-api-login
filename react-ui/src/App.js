@@ -9,9 +9,9 @@ import RegisterScreen from './screens/RegisterScreen'
 
 function App() {
   return (
-    <div>
+    <div className="App">
     
-      <Header />
+      {/* <Header /> */}
       <main className="py-3">
         <Container>
           

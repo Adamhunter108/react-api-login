@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 // import Message from '../components/Message'
 import { login } from '../actions/userActions'
 import FormContainer from '../components/FormContainer'
+import Header from '../components/Header'
 
 function LoginScreen({ location, history }) {
     const [email, setEmail] = useState('')
@@ -54,6 +55,8 @@ function LoginScreen({ location, history }) {
     }
 
     return (
+        <div>
+            <Header />
         <Card 
             className="text-center"
             >
@@ -67,7 +70,7 @@ function LoginScreen({ location, history }) {
             <Form onSubmit={submitHandler}>
 
                 <Form.Group as={Row} controlId='email'>
-                    <Form.Label column sm={1}><h3><i class="fas fa-envelope"></i></h3></Form.Label>
+                    <Form.Label column sm={1}><h4><i class="fas fa-envelope"></i></h4></Form.Label>
                     <Col>
                         <FloatingLabel label="Email Address">
                             <Form.Control
@@ -83,7 +86,7 @@ function LoginScreen({ location, history }) {
                 <br />
 
                 <Form.Group as={Row} controlId='password'>
-                    <Form.Label column sm={1}><h3><i class="fas fa-key"></i></h3></Form.Label>
+                    <Form.Label column sm={1}><h4><i class="fas fa-key"></i></h4></Form.Label>
                     <Col>
                         <FloatingLabel label="Password">
                             <Form.Control
@@ -111,6 +114,7 @@ function LoginScreen({ location, history }) {
 
         </FormContainer>
         </Card>
+        </div>
     )
 }
 

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 // import Message from '../components/Message'
 import { register } from '../actions/userActions'
 import FormContainer from '../components/FormContainer'
+import Header from '../components/Header'
 
 
 function RegisterScreen({ location, history }) {
@@ -51,6 +52,9 @@ function RegisterScreen({ location, history }) {
     }
 
     return (
+        <div>
+            <Header />
+            
         <Card 
             className="text-center"
             >
@@ -66,24 +70,24 @@ function RegisterScreen({ location, history }) {
             {/* <Form> */}
             
                 <Form.Group as={Row} controlId='name'>
-                    <Form.Label column sm={1}><h3><i className="fas fa-user"></i></h3></Form.Label>
+                    <Form.Label column sm={1}><h4><i className="fas fa-user"></i></h4></Form.Label>
                     <Col>
                         <FloatingLabel label="Your name">
-                        <Form.Control
-                            required
-                            type='name'
-                            placeholder='Enter Your Name'
-                            value={name}
-                            onChange={(event) => setName(event.target.value)}
-                        >
-                        </Form.Control>
+                            <Form.Control
+                                required
+                                type='name'
+                                placeholder='Enter Your Name'
+                                value={name}
+                                onChange={(event) => setName(event.target.value)}
+                            >
+                            </Form.Control>
                         </FloatingLabel>
                     </Col>
                 </Form.Group>
                 <br />
 
                 <Form.Group as={Row} controlId='email'>
-                    <Form.Label column sm={1}><h3><i class="fas fa-envelope"></i></h3></Form.Label>
+                    <Form.Label column sm={1}><h4><i class="fas fa-envelope"></i></h4></Form.Label>
                     <Col>
                         <FloatingLabel label="Email">
                             <Form.Control
@@ -93,35 +97,43 @@ function RegisterScreen({ location, history }) {
                                 value={email}
                                 onChange={(event) => setEmail(event.target.value)}
                             >
-                        </Form.Control>
-                    </FloatingLabel>
+                            </Form.Control>
+                        </FloatingLabel>
                     </Col>
                 </Form.Group>
                 <br />
 
-                <Form.Group controlId='password'>
-                    <Form.Label><i class="fas fa-key"></i> Password</Form.Label>
-                    <Form.Control
-                        required
-                        type='password'
-                        placeholder='Enter Password'
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
-                    >
-                    </Form.Control>
+                <Form.Group as={Row} controlId='password'>
+                    <Form.Label column sm={1}><h4><i class="fas fa-key"></i></h4></Form.Label>
+                    <Col>
+                        <FloatingLabel label="Password">
+                            <Form.Control
+                                required
+                                type='password'
+                                placeholder='Enter Password'
+                                value={password}
+                                onChange={(event) => setPassword(event.target.value)}
+                            >
+                            </Form.Control>
+                        </FloatingLabel>
+                    </Col>
                 </Form.Group>
                 <br />
 
-                <Form.Group controlId='passwordConfirm'>
-                    <Form.Label><i class="fas fa-key"></i> Confirm Password</Form.Label>
-                    <Form.Control
-                        required
-                        type='password'
-                        placeholder='Enter Password Again'
-                        value={confirmPassword}
-                        onChange={(event) => setConfirmPassword(event.target.value)}
-                    >
-                    </Form.Control>
+                <Form.Group as={Row} controlId='passwordConfirm'>
+                    <Form.Label column sm={1}><h4><i class="fas fa-key"></i><i class="fas fa-key"></i></h4></Form.Label>
+                    <Col>
+                        <FloatingLabel label="Confirm Password">
+                            <Form.Control
+                                required
+                                type='password'
+                                placeholder='Enter Password Again'
+                                value={confirmPassword}
+                                onChange={(event) => setConfirmPassword(event.target.value)}
+                            >
+                            </Form.Control>
+                        </FloatingLabel>
+                    </Col>
                 </Form.Group>
                 <br />
 
@@ -138,6 +150,7 @@ function RegisterScreen({ location, history }) {
 
         </FormContainer>
         </Card>
+        </div>
     )
 }
 

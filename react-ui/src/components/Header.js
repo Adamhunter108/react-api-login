@@ -28,7 +28,7 @@ function Header() {
     
 
   return (
-    <header>
+    <div>
         <Navbar bg="black" variant="dark" expand={false}>
             <Container fluid>
                 <LinkContainer to='/'>
@@ -56,7 +56,7 @@ function Header() {
                 <Nav className="justify-content-end flex-grow-1 pe-3">
 
                 <LinkContainer to='/'>
-                    <Nav.Link><i class="fa-solid fa-house-chimney"></i>  Home</Nav.Link>
+                    <Nav.Link><h4><i class="fa-solid fa-house-chimney"></i>  Home</h4></Nav.Link>
                 </LinkContainer>
 
 
@@ -85,12 +85,12 @@ function Header() {
                         <NavDropdown.Item><i class="fas fa-address-card"></i> Profile</NavDropdown.Item>
                     </LinkContainer> */}
 
-                    <NavDropdown.Item onClick={logoutHandler}><i class="fas fa-sign-out-alt"></i> Logout</NavDropdown.Item>
+                    <NavDropdown.Item onClick={logoutHandler}><h4><i class="fas fa-sign-out-alt"></i> Logout</h4></NavDropdown.Item>
 
                 </NavDropdown>
             ): (
                 <LinkContainer to='/login'>
-                    <Nav.Link to="/login"><i class="fa-solid fa-skull"></i> Login</Nav.Link>
+                    <Nav.Link to="/login"><h4><i class="fa-solid fa-skull"></i> Login</h4></Nav.Link>
                 </LinkContainer>
             )}
 
@@ -104,7 +104,7 @@ function Header() {
                     </NavDropdown.Item>
                 </NavDropdown> */}
                 </Nav>
-                <Form className="d-flex">
+                {/* <Form className="d-flex">
                     <FormControl
                         type="search"
                         placeholder="Search"
@@ -112,13 +112,13 @@ function Header() {
                         aria-label="Search"
                     />
                     <Button variant="outline-success">Search</Button>
-                </Form>
+                </Form> */}
             </Offcanvas.Body>
             </Navbar.Offcanvas>
              </Container>
         </Navbar>
 
-    </header>
+    </div>
   )
 }
 
